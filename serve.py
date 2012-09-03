@@ -25,13 +25,14 @@ def hello():
 @app.route("/q")
 def query():
   q_json = request.args.get("q")
-  q = json.loads(q_json)
-  re = q.get('re')
+  re = request.args.get("regexp")
+  caseinsensitive = request.args.get("caseinsensitive")
+  filetypes = request.args.get("filetypes")
 
   all_results = []
   exited_early = False
   for repo in REPOS:
-    results = gitgrep(repo, re)
+    results = gitgrep(repo, re, filetypes, caseinsensitive)
     all_results += results
     if len(all_results) >= MAX_RESULTS_TOTAL:
       exited_early = True
@@ -40,7 +41,7 @@ def query():
     'results': all_results
   })
 
-def gitgrep(repo, regexp):
+def gitgrep(repo, regexp, filetypes, caseinsensitive):
   """
   repo is a (path, refname); regexp is an expression
   """
@@ -50,7 +51,13 @@ def gitgrep(repo, regexp):
     "grep", 
     "--null", 
     "--line-number", 
-    "-e", regexp, tree]
+    "-e", regexp]
+  if caseinsensitive:
+    argv.append("-i")
+  argv.append(tree)
+  argv.append("--")
+  if filetypes:
+    argv.extend(filetypes.split(" "))
   app.logger.info("Executing: %s", argv)
   sub = subprocess.Popen(
     argv,

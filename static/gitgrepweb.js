@@ -22,16 +22,23 @@ ko.applyBindings({
   results: results
 }, $('#results')[0]);
 
-$('#submit').click(function(e) {
-  e.stopPropagation();
+var computeQuery = function() {
+  query = { 
+    'regexp': $('#regexp').val(),
+    'filetypes': $('#filetypes').val(),
+    'caseinsensitive': $('#caseinsensitive')[0].checked
+  }
+  return query;
+}
 
+var execute = function() {
   $('#spinner').show();
   $('#error_message').hide();
-  query = { 're': $('#regexp').val() };
+  query = computeQuery();
   $.ajax({
     url: "/q",
     dataType: "json",
-    data: { 'q': JSON.stringify(query) }
+    data: query
   }).done(function(x) {
     $('#spinner').hide();
     results.removeAll();
@@ -48,5 +55,23 @@ $('#submit').click(function(e) {
     $('#spinner').hide();
     $('#error_message').show();
   });
+}
+
+$('#submit').click(function(e) {
+  e.stopPropagation();
+  execute();
 });
 
+// Listen for changes and update hash
+$('#regexp').keyup(function() { 
+  $.bbq.pushState( computeQuery() );
+  execute();
+});
+
+$().ready(function() {
+  if ($.bbq.getState("regexp")) {
+    $('#regexp').val($.bbq.getState("regexp"));
+    $('#filetypes').val($.bbq.getState("filetypes"));
+    $('#caseinsensitive')[0].checked = $.bbq.getState("caseinsensitive");
+  }
+});
