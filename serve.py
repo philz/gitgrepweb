@@ -50,7 +50,7 @@ def gitgrep(repo, regexp, filetypes, caseinsensitive):
     "--git-dir", path, 
     "grep", 
     "--null", 
-    "--line-number", 
+    "-n",  # --line-number is only in recent gits
     "-e", regexp]
   if caseinsensitive:
     argv.append("-i")
@@ -74,4 +74,5 @@ def gitgrep(repo, regexp, filetypes, caseinsensitive):
   return results
   
 if __name__ == "__main__":
+    # app.run(debug=True,host="0.0.0.0")
     app.run(debug=True)
