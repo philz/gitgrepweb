@@ -1,0 +1,12 @@
+[
+  {
+        "path": "/home/user/src/project/.git", 
+        "name": "project.git", 
+        "tree": "origin/master"
+  },
+  {
+        "path": "/home/user/src/project2/.git",
+        "name": "project2",
+        "tree": "origin/master"
+  }
+]
